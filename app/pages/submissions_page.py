@@ -9,18 +9,18 @@ from typing import List
 
 
 def display_cylinder_checks_for_size(
-    checks_list: rx.Var[List[CylinderCheckData]],
+    checks_list_var: rx.Var[List[CylinderCheckData]],
     size_label: str,
 ) -> rx.Component:
     return rx.cond(
-        checks_list.length() > 0,
+        checks_list_var.length() > 0,
         rx.el.div(
             rx.el.h5(
                 f"{size_label} Cylinders:",
                 class_name="text-sm font-semibold text-gray-700 mt-2 mb-1",
             ),
             rx.foreach(
-                checks_list,
+                checks_list_var,
                 lambda check, idx: rx.el.div(
                     rx.el.p(
                         f"Cylinder {idx + 1}: ID: {rx.cond(check['cylinder_id'], check['cylinder_id'], 'N/A')}, Purity: {check['purity']}%, Pressure: {check['pressure']} psi",
@@ -35,7 +35,7 @@ def display_cylinder_checks_for_size(
 
 
 def submission_card(
-    submission: HandoverEntry, index: int
+    submission: rx.Var[HandoverEntry], index: rx.Var[int]
 ) -> rx.Component:
     return rx.el.details(
         rx.el.summary(
@@ -78,21 +78,21 @@ def submission_card(
             ),
             rx.cond(
                 (
-                    rx.Var(
-                        submission["cylinder_checks_2m"]
-                    ).length()
+                    submission[
+                        "cylinder_checks_2m"
+                    ].length()
                     > 0
                 )
                 | (
-                    rx.Var(
-                        submission["cylinder_checks_4m"]
-                    ).length()
+                    submission[
+                        "cylinder_checks_4m"
+                    ].length()
                     > 0
                 )
                 | (
-                    rx.Var(
-                        submission["cylinder_checks_7m"]
-                    ).length()
+                    submission[
+                        "cylinder_checks_7m"
+                    ].length()
                     > 0
                 ),
                 rx.el.div(
@@ -101,21 +101,15 @@ def submission_card(
                         class_name="text-md font-medium text-gray-700 mt-3 mb-1",
                     ),
                     display_cylinder_checks_for_size(
-                        rx.Var(
-                            submission["cylinder_checks_2m"]
-                        ),
+                        submission["cylinder_checks_2m"],
                         "2m³",
                     ),
                     display_cylinder_checks_for_size(
-                        rx.Var(
-                            submission["cylinder_checks_4m"]
-                        ),
+                        submission["cylinder_checks_4m"],
                         "4m³",
                     ),
                     display_cylinder_checks_for_size(
-                        rx.Var(
-                            submission["cylinder_checks_7m"]
-                        ),
+                        submission["cylinder_checks_7m"],
                         "7m³",
                     ),
                     class_name="mt-2",
