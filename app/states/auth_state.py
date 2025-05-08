@@ -28,9 +28,11 @@ class AuthState(rx.State):
                 "Username and password are required."
             )
             return
+        current_username = self.username_form_input
+        current_password = self.password_form_input
         uri = MONGO_URI_TEMPLATE.format(
-            db_username=self.username_form_input,
-            db_password=self.password_form_input,
+            db_username=current_username,
+            db_password=current_password,
         )
         try:
             client = MongoClient(
@@ -38,15 +40,11 @@ class AuthState(rx.State):
             )
             client.admin.command("ping")
             self.is_authenticated = True
-            self.authenticated_username = (
-                self.username_form_input
-            )
+            self.authenticated_username = current_username
             self._authenticated_password_DO_NOT_EXPOSE = (
-                self.password_form_input
+                current_password
             )
-            current_password_form_input = (
-                self.password_form_input
-            )
+            self.username_form_input = ""
             self.password_form_input = ""
             client.close()
             return rx.redirect("/handover_entry_p1")

@@ -2,10 +2,7 @@ import reflex as rx
 from typing import TypedDict, List
 from pymongo import MongoClient, errors
 from bson.objectid import ObjectId
-from app.states.auth_state import (
-    AuthState,
-    MONGO_URI_TEMPLATE,
-)
+from app.states.auth_state import MONGO_URI_TEMPLATE
 import datetime
 
 
@@ -55,6 +52,8 @@ class CylinderState(rx.State):
 
     @rx.var
     async def bmt_in_charge_display(self) -> str:
+        from app.states.auth_state import AuthState
+
         auth_s = await self.get_state(AuthState)
         if (
             auth_s.is_authenticated
@@ -227,6 +226,8 @@ class CylinderState(rx.State):
             )
 
     async def _get_db_client(self) -> MongoClient | None:
+        from app.states.auth_state import AuthState
+
         auth_s = await self.get_state(AuthState)
         username = auth_s.authenticated_username
         password = (
@@ -309,17 +310,22 @@ class CylinderState(rx.State):
             )
             from app.states.auth_state import AuthState
 
-            auth_s = await self.get_state(AuthState)
-            if auth_s.is_authenticated:
-                yield auth_s.sign_out()
+            auth_s_check = await self.get_state(AuthState)
+            if auth_s_check.is_authenticated:
+                yield auth_s_check.sign_out()
             return
         try:
             db = client[self._DB_NAME]
             collection = db[self._COLLECTION_NAME]
-            auth_s = await self.get_state(AuthState)
+            from app.states.auth_state import AuthState
+
+            auth_s_submit = await self.get_state(AuthState)
+            current_bmt_in_charge = (
+                await self.bmt_in_charge_display
+            )
             entry_data_to_insert = {
                 "facility": self.selected_facility,
-                "bmt_in_charge": await self.bmt_in_charge_display,
+                "bmt_in_charge": current_bmt_in_charge,
                 "receiving_personnel": (
                     self.receiving_personnel
                     if self.receiving_personnel
@@ -331,7 +337,7 @@ class CylinderState(rx.State):
                 "cylinder_checks_2m": plain_checks_2m,
                 "cylinder_checks_4m": plain_checks_4m,
                 "cylinder_checks_7m": plain_checks_7m,
-                "submitted_by": auth_s.authenticated_username
+                "submitted_by": auth_s_submit.authenticated_username
                 or "Unknown",
                 "submission_timestamp": datetime.datetime.utcnow().isoformat(),
             }

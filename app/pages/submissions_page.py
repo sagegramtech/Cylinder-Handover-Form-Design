@@ -141,7 +141,7 @@ def submissions_page() -> rx.Component:
                 rx.el.div(
                     rx.icon(
                         tag="loader",
-                        class_name="animate-spin h-10 w-10 text-indigo-600",
+                        class_name="animate-spin h-10 w-10 text-indigo-600 mx-auto",
                     ),
                     class_name="flex justify-center py-10",
                 ),
@@ -162,30 +162,34 @@ def submissions_page() -> rx.Component:
                     ),
                 ),
             ),
-            rx.el.dialog(
-                rx.el.h3(
-                    "Confirm Deletion",
-                    class_name="text-lg font-bold text-gray-800 mb-2",
-                ),
-                rx.el.p(
-                    "Are you sure you want to delete this submission? This action cannot be undone.",
-                    class_name="text-sm text-gray-600 mb-4",
-                ),
-                rx.el.div(
-                    rx.el.button(
-                        "Cancel",
-                        on_click=CylinderState.cancel_delete_submission,
-                        class_name="mr-2 px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500",
+            rx.dialog.root(
+                rx.dialog.trigger(rx.fragment()),
+                rx.dialog.content(
+                    rx.dialog.title(
+                        "Confirm Deletion",
+                        class_name="text-lg font-bold text-gray-800 mb-2",
                     ),
-                    rx.el.button(
-                        "Confirm Delete",
-                        on_click=CylinderState.confirm_delete_submission,
-                        class_name="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
+                    rx.dialog.description(
+                        "Are you sure you want to delete this submission? This action cannot be undone.",
+                        class_name="text-sm text-gray-600 mb-4",
                     ),
-                    class_name="mt-4 flex justify-end",
+                    rx.el.div(
+                        rx.el.button(
+                            "Cancel",
+                            on_click=CylinderState.cancel_delete_submission,
+                            class_name="mr-2 px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500",
+                        ),
+                        rx.el.button(
+                            "Confirm Delete",
+                            on_click=CylinderState.confirm_delete_submission,
+                            class_name="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500",
+                        ),
+                        class_name="mt-4 flex justify-end",
+                    ),
+                    class_name="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-6 bg-white rounded-lg shadow-xl border border-gray-200 max-w-md mx-auto z-50",
                 ),
                 open=CylinderState.show_delete_confirm_dialog,
-                class_name="p-6 bg-white rounded-lg shadow-xl border border-gray-200 max-w-md mx-auto z-50 fixed inset-x-0 top-1/4",
+                on_open_change=CylinderState.set_show_delete_confirm_dialog,
             ),
             class_name="max-w-4xl mx-auto",
         )
