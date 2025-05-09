@@ -46,18 +46,23 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: python-app
 
-      - name: Unzip artifact
-        run: unzip release.zip
+    - name: Unzip artifact for deployment
+      run: unzip release.zip
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
-          app-name: 'cylinder-handover'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_b768a18713a04476b35ea2323176f3c1 }}
+    - name: 'Login to Azure'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Deploy to Azure Web App'
+      uses: azure/webapps-deploy@v3
+      id: deploy-to-webapp
+      with:
+        app-name: 'cylinder-handover'
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b768a18713a04476b35ea2323176f3c1 }}
